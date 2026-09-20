@@ -1,70 +1,102 @@
-from decimal import Decimal
-from pydantic import BaseModel, field_validator
-import re
+from datetime import datetime
+from enum import Enum
+from typing import List, Optional
+from pydantic import BaseModel, Field
+import uuid
 
-class RERACertificatePayload(BaseModel):
-    project_id: str
-    architect_completion_pct: float  # Form 1
-    engineer_completion_pct: float   # Form 2
-    ca_withdrawal_eligible_inr: Decimal # Form 3
-    ca_udin: str                     # Must be 18 digits with valid prefix
+class EscrowStatus(str, Enum):
+    DRAFT = "DRAFT"
+    FUNDED = "FUNDED"
+    MILESTONE_MET = "MILESTONE_MET"
+    TRUSTEE_APPROVED = "TRUSTEE_APPROVED"
+    DISBURSED = "DISBURSED"
+    DISPUTED = "DISPUTED"
 
-    @field_validator("ca_udin")
-    def validate_udin(cls, v):
-        # Format: 2-digit Year (e.g. 26) + 6-digit ICAI Membership + 10 alphanumeric chars
-        if not re.match(r"^26\d{6}[A-Z0-9]{10}$", v):
-            raise ValueError("INVALID_ICAI_UDIN_AUTHENTICATION_STRING")
-        return v
+class MilestoneCondition(BaseModel):
+    milestone_id: str
+    description: str
+    target_amount: float = Field(gt=0)
+    requires_trustee_approval: bool = True
+    is_completed: bool = False
 
-class RERAEscrowManager:
-    def __init__(self, ledger: DoubleEntryEngine, acc1_id: str, acc2_id: str, acc3_id: str):
-        self.ledger = ledger
-        self.acc1_id = acc1_id # Designated Collection Account (100%)
-        self.acc2_id = acc2_id # Separate Escrow Account (70%)
-        self.acc3_id = acc3_id # Operative Account (30%)
+class DigitalEscrowContract(BaseModel):
+    contract_id: str
+    depositor_id: str
+    beneficiary_id: str
+    trustee_id: str
+    virtual_account_no: str
+    total_locked_amount: float
+    current_balance: float
+    status: EscrowStatus
+    milestones: List[MilestoneCondition]
+    approval_signatures: List[str] = []
 
-    def handle_allottee_inflow(self, amount: Decimal, utr: str, flat_van: str):
-        # Step 1: Inflow directly into Account 1
-        self.ledger.post_balanced_transaction(
-            utr=f"{utr}_COLL",
-            narration=f"Allottee booking collection via {flat_van}",
-            debit_acc_id=self.acc1_id,
-            credit_acc_id="LIAB_ALLOTTEE_DEPOSITS",
-            amount=amount
+class DigitalEscrowEngine:
+    def __init__(self, db_client, payout_pipeline):
+        self.db = db_client
+        self.payout_pipeline = payout_pipeline
+
+    def create_escrow_deal(self, depositor: str, beneficiary: str, trustee: str, amount: float, milestones: List[dict]):
+        contract_id = f"ESC_{uuid.uuid4().hex[:8].upper()}"
+        va_number = f"VA_{uuid.uuid4().hex[:10].upper()}"
+        
+        parsed_milestones = [MilestoneCondition(**m) for m in milestones]
+        
+        contract = DigitalEscrowContract(
+            contract_id=contract_id,
+            depositor_id=depositor,
+            beneficiary_id=beneficiary,
+            trustee_id=trustee,
+            virtual_account_no=va_number,
+            total_locked_amount=amount,
+            current_balance=0.0,
+            status=EscrowStatus.DRAFT,
+            milestones=parsed_milestones
+        )
+        self.db.save_contract(contract.model_dump())
+        return contract
+
+    def deposit_funds_webhook(self, va_number: str, amount: float, bank_utr: str):
+        """Simulates Castler receiving money into a designated nodal virtual account"""
+        contract = self.db.get_by_virtual_account(va_number)
+        contract["current_balance"] += amount
+        if contract["current_balance"] >= contract["total_locked_amount"]:
+            contract["status"] = EscrowStatus.FUNDED
+        
+        self.db.update_contract(contract["contract_id"], contract)
+        return {"contract_id": contract["contract_id"], "status": contract["status"], "balance": contract["current_balance"]}
+
+    async def sign_and_release_milestone(self, contract_id: str, milestone_id: str, trustee_signature: str):
+        """Trustee sign-off + automated payout trigger"""
+        contract = self.db.get_contract(contract_id)
+        
+        if contract["status"] not in [EscrowStatus.FUNDED, EscrowStatus.MILESTONE_MET]:
+            raise ValueError("Escrow funds not locked or contract not in executable state")
+
+        # Find target milestone
+        milestone = next((m for m in contract["milestones"] if m["milestone_id"] == milestone_id), None)
+        if not milestone:
+            raise ValueError("Milestone not found")
+
+        if contract["current_balance"] < milestone["target_amount"]:
+            raise ValueError("Insufficient balance in escrow to disburse this milestone")
+
+        # Record trustee multi-sig signature
+        contract["approval_signatures"].append(f"{trustee_signature}_{datetime.utcnow().isoformat()}")
+        milestone["is_completed"] = True
+
+        # Trigger hardened payout pipeline with idempotency
+        idempotency_key = f"IDEM_{contract_id}_{milestone_id}"
+        payout_res = await self.payout_pipeline.execute_automated_payout(
+            contract_id=contract_id,
+            amount=milestone["target_amount"],
+            beneficiary=contract["beneficiary_id"],
+            idempotency_key=idempotency_key
         )
 
-        # Step 2: Automated End-of-Day/Real-Time Sweep (70:30 Rule)
-        amount_70 = (amount * Decimal("0.70")).quantize(Decimal("0.01"))
-        amount_30 = amount - amount_70
+        contract["current_balance"] -= milestone["target_amount"]
+        if contract["current_balance"] == 0:
+            contract["status"] = EscrowStatus.DISBURSED
 
-        # Sweep 70% to Account 2
-        self.ledger.post_balanced_transaction(
-            utr=f"{utr}_SWEEP_70",
-            narration=f"RERA 70% mandatory project split for {flat_van}",
-            debit_acc_id=self.acc2_id,
-            credit_acc_id=self.acc1_id,
-            amount=amount_70
-        )
-
-        # Sweep 30% to Account 3
-        self.ledger.post_balanced_transaction(
-            utr=f"{utr}_SWEEP_30",
-            narration=f"RERA 30% operative split for {flat_van}",
-            debit_acc_id=self.acc3_id,
-            credit_acc_id=self.acc1_id,
-            amount=amount_30
-        )
-
-    def release_milestone_funds(self, cert: RERACertificatePayload, release_utr: str):
-        # Verification: Physical completion alignment
-        if abs(cert.architect_completion_pct - cert.engineer_completion_pct) > 5.0:
-            raise ValueError("SITE_DISCREPANCY: Architect and Engineer percentages diverge > 5.0%")
-
-        # Post release from Account 2 to Account 3
-        return self.ledger.post_balanced_transaction(
-            utr=release_utr,
-            narration=f"RERA Milestone Fund Release - Form 3 UDIN: {cert.ca_udin}",
-            debit_acc_id=self.acc3_id,
-            credit_acc_id=self.acc2_id,
-            amount=cert.ca_withdrawal_eligible_inr
-        )
+        self.db.update_contract(contract_id, contract)
+        return {"payout": payout_res, "remaining_escrow_balance": contract["current_balance"]}
