@@ -1,217 +1,139 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>TBG-CORE Enterprise Workbench</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TBG-CORE Enterprise Workbench</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; }
+    body { background-color: #030712; color: #f8fafc; padding: 14px 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; }
+    .title { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; }
+    .badge { font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 6px; border-radius: 4px; }
+    .docs-btn { background: #0f172a; border: 1px solid #1e293b; color: #f8fafc; font-size: 11px; padding: 6px 12px; border-radius: 4px; text-decoration: none; }
+    
+    .console-box { background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; margin-bottom: 14px; }
+    .console-header { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+    .input-row { display: flex; gap: 8px; margin-bottom: 6px; }
+    .console-input { flex: 1; background: #030712; border: 1px solid #1e293b; color: #e2e8f0; font-size: 11px; padding: 6px 10px; border-radius: 4px; }
+    .route-btn { background: #059669; color: #fff; border: none; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    .status-text { font-size: 11px; color: #64748b; font-style: italic; }
+
+    .grid-title { font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 10px; text-transform: uppercase; }
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .card { background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .card-title { font-size: 12px; font-weight: 700; color: #f8fafc; }
+    .tag { font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: 600; }
+    .tag-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .tag-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .tag-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .tag-orange { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+    .tag-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .card-desc { font-size: 10.5px; color: #64748b; line-height: 1.35; margin-bottom: 8px; }
+    .card-btn { width: 100%; background: #111c35; border: 1px solid #1e293b; color: #f8fafc; font-size: 10.5px; font-weight: 600; padding: 6px; border-radius: 4px; cursor: pointer; }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen p-6">
-    <div class="max-w-7xl mx-auto space-y-6">
-        <header class="flex items-center justify-between border-b border-slate-800 pb-4">
-            <div class="flex items-center space-x-3">
-                <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                <h1 class="text-xl font-bold tracking-wider text-white uppercase">The Unified TBG-Core</h1>
-                <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-mono font-semibold">ALL 9 ENGINES ACTIVE</span>
-            </div>
-            <a href="/docs" target="_blank" class="px-4 py-1.5 text-xs font-semibold rounded border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200">
-                Open API Specs (/docs)
-            </a>
-        </header>
+<body>
 
-        <!-- AI AGENT ROUTER -->
-        <div class="p-5 rounded-lg bg-slate-900/90 border border-slate-800 space-y-3">
-            <div class="flex justify-between items-center">
-                <h2 class="text-sm font-semibold tracking-wide text-slate-200">AI Agent Rail Routing Console</h2>
-                <span class="text-xs text-slate-400 font-mono">Simulates natural language parsing</span>
-            </div>
-            <div class="flex gap-2">
-                <input id="agentInput" type="text" value="Client needs to debit 10000 loan EMI every month on 5th via bank mandate"
-                       class="flex-1 bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-mono">
-                <button onclick="resolveQuery()" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs px-5 py-2 rounded transition">
-                    Route Query
-                </button>
-            </div>
-            <div id="agentOutput" class="p-3 bg-slate-950 rounded border border-slate-800 font-mono text-xs text-slate-300 min-h-[48px] flex items-center">
-                Ready for query resolution...
-            </div>
-        </div>
+  <div class="header">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="title">THE UNIFIED TBG-CORE</span>
+      <span class="badge">ALL 9 ENGINES ACTIVE</span>
+    </div>
+    <a href="/docs" class="docs-btn">Open API Specs (/docs)</a>
+  </div>
 
-        <!-- 9 CORE ENGINE CARDS -->
-        <div>
-            <h3 class="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider mb-3">9 Core Operational Services</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-                
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">1. Escrow Multi-Sig</span>
-                        <span class="text-[10px] bg-emerald-950 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-800">2-of-3 Safe</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Milestone trust custody. Locks buyer funds until conditions clear.</p>
-                    <button onclick="triggerEngine('ESCROW_MULTISIG', 5000000)" class="w-full bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Dispatch Lock (₹50,000)
-                    </button>
-                </div>
+  <div class="console-box">
+    <div class="console-header">
+      <span>AI Agent Rail Routing Console</span>
+      <span>Simulates natural language parsing</span>
+    </div>
+    <div class="input-row">
+      <input type="text" class="console-input" value="Client needs to debit 10000 loan EMI every month on 5th via bank mandate" />
+      <button class="route-btn">Route Query</button>
+    </div>
+    <div class="status-text">Ready for query resolution...</div>
+  </div>
 
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">2. 2PC Bulk Disbursals</span>
-                        <span class="text-[10px] bg-sky-950 text-sky-400 px-1.5 py-0.5 rounded border border-sky-800">IMPS/RTGS</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Two-phase reservation preventing double-spend during bank timeouts.</p>
-                    <button onclick="triggerEngine('BULK_PAYOUT_2PC', 2500000)" class="w-full bg-slate-800 hover:bg-sky-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Execute Payout (₹25,000)
-                    </button>
-                </div>
+  <div class="grid-title">9 Core Operational Services</div>
 
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">3. Virtual Accounts (CMS)</span>
-                        <span class="text-[10px] bg-purple-950 text-purple-400 px-1.5 py-0.5 rounded border border-purple-800">Smart VAN</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Dynamic VAN collections with automated 1:1 invoice ledger mapping.</p>
-                    <button onclick="triggerEngine('VAN_COLLECTION', 1500000)" class="w-full bg-slate-800 hover:bg-purple-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Collect VAN Credit (₹15,000)
-                    </button>
-                </div>
-
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">4. e-NACH Standing Orders</span>
-                        <span class="text-[10px] bg-amber-950 text-amber-400 px-1.5 py-0.5 rounded border border-amber-800">NPCI Rail</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Auto-debit recurring mandates from bank accounts on schedule dates.</p>
-                    <button onclick="triggerEngine('E_NACH_MANDATE', 1000000)" class="w-full bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Trigger Mandate Pull (₹10,000)
-                    </button>
-                </div>
-
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">5. Liquidity Sweep Pool</span>
-                        <span class="text-[10px] bg-cyan-950 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-800">ZBA / TBA</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">End-of-day balance concentration sweep to optimize idle treasury yields.</p>
-                    <button onclick="triggerEngine('LIQUIDITY_SWEEP', 7500000)" class="w-full bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Sweep Idle Float (₹75,000)
-                    </button>
-                </div>
-
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">6. FX Cross-Border Rail</span>
-                        <span class="text-[10px] bg-rose-950 text-rose-400 px-1.5 py-0.5 rounded border border-rose-800">SWIFT Nostro</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Outward remittance using Nostro mirror clearing with locked spot rates.</p>
-                    <button onclick="triggerEngine('FX_CROSS_BORDER', 12000000)" class="w-full bg-slate-800 hover:bg-rose-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Dispatch Remit (₹1,20,000)
-                    </button>
-                </div>
-
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">7. Supply Chain Tranche</span>
-                        <span class="text-[10px] bg-indigo-950 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-800">Factoring</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Financier tranche disbursal tied to electronic proof-of-delivery milestones.</p>
-                    <button onclick="triggerEngine('SUPPLY_CHAIN_ESCROW', 3000000)" class="w-full bg-slate-800 hover:bg-indigo-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Disburse Tranche (₹30,000)
-                    </button>
-                </div>
-
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">8. Treasury Position P&L</span>
-                        <span class="text-[10px] bg-teal-950 text-teal-400 px-1.5 py-0.5 rounded border border-teal-800">Accrual</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Intraday cash valuation and accrual calculation for corporate capital.</p>
-                    <button onclick="triggerEngine('TREASURY_POSITION', 100000)" class="w-full bg-slate-800 hover:bg-teal-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Run Accrual Calculation
-                    </button>
-                </div>
-
-                <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-white text-sm">9. ISO 20022 Engine</span>
-                        <span class="text-[10px] bg-orange-950 text-orange-400 px-1.5 py-0.5 rounded border border-orange-800">pain.001</span>
-                    </div>
-                    <p class="text-slate-400 text-[11px]">Generates XML envelopes compliant with core-banking H2H rails.</p>
-                    <button onclick="triggerEngine('ISO20022_MESSAGE', 500000)" class="w-full bg-slate-800 hover:bg-orange-500 hover:text-slate-950 text-white font-bold py-1.5 rounded transition">
-                        Generate Envelope (₹5,000)
-                    </button>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- REAL-TIME AUDIT LOGS & ISO PREVIEW -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
-            <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-slate-300 uppercase">Live Execution Stream</span>
-                    <button onclick="refreshLogs()" class="text-emerald-400 hover:underline">Refresh</button>
-                </div>
-                <div id="logsBox" class="space-y-1 text-slate-400">
-                    No transactions executed yet. Click any service button above.
-                </div>
-            </div>
-
-            <div class="p-4 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-                <span class="font-bold text-slate-300 uppercase">ISO 20022 Generated Envelope</span>
-                <pre id="xmlBox" class="p-3 bg-slate-950 rounded text-emerald-400 overflow-x-auto h-40 border border-slate-800/80">
-<!-- Waiting for engine trigger... -->
-                </pre>
-            </div>
-        </div>
+  <div class="services-grid">
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">1. Escrow Multi-Sig</span><span class="tag tag-green">2-of-3 Safe</span></div>
+        <div class="card-desc">Milestone trust custody. Locks buyer funds until conditions clear.</div>
+      </div>
+      <button class="card-btn">Dispatch Lock (₹50,000)</button>
     </div>
 
-    <script>
-        async function resolveQuery() {
-            const prompt = document.getElementById('agentInput').value;
-            const res = await fetch('/api/v1/agent/resolve', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ prompt: prompt })
-            });
-            const d = await res.json();
-            document.getElementById('agentOutput').innerHTML = 
-                `<span class="text-emerald-400 font-bold">[ROUTED: ${d.recommended_service || d.service}]</span> &bull; Rail: <span class="text-sky-300">${d.rail}</span> &bull; <span class="text-slate-400">${d.reasoning}</span>`;
-        }
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">2. 2PC Bulk Disbursals</span><span class="tag tag-blue">IMPS/RTGS</span></div>
+        <div class="card-desc">Two-phase reservation preventing double-spend during bank timeouts.</div>
+      </div>
+      <button class="card-btn">Execute Payout (₹25,000)</button>
+    </div>
 
-        async function triggerEngine(code, amt) {
-            const res = await fetch('/api/v1/services/trigger', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    service_code: code,
-                    source_account: "CORP_PRIMARY_01",
-                    target_account: "CLEARING_POOL_01",
-                    amount_paisa: amt,
-                    extra_params: { initiated_by: "USER_DIRECT" }
-                })
-            });
-            const d = await res.json();
-            if (d.iso_envelope) {
-                document.getElementById('xmlBox').textContent = d.iso_envelope;
-            }
-            refreshLogs();
-        }
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">3. Virtual Accounts (CMS)</span><span class="tag tag-purple">Smart VAN</span></div>
+        <div class="card-desc">Dynamic VAN collections with automated 1:1 invoice ledger mapping.</div>
+      </div>
+      <button class="card-btn">Collect VAN Credit (₹15,000)</button>
+    </div>
 
-        async function refreshLogs() {
-            const res = await fetch('/api/v1/system/state');
-            const d = await res.json();
-            if (d.transactions && d.transactions.length > 0) {
-                let h = '';
-                d.transactions.forEach(t => {
-                    h += `<div class="flex justify-between bg-slate-950 p-1.5 rounded border border-slate-800">
-                        <span class="text-sky-400 font-bold">${t.service}</span>
-                        <span>₹${t.inr.toLocaleString('en-IN')}</span>
-                        <span class="text-emerald-400 font-bold">${t.status}</span>
-                    </div>`;
-                });
-                document.getElementById('logsBox').innerHTML = h;
-            }
-        }
-        refreshLogs();
-    </script>
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">4. e-NACH Standing Orders</span><span class="tag tag-orange">NPCI Rail</span></div>
+        <div class="card-desc">Auto-debit recurring mandates from bank accounts on schedule dates.</div>
+      </div>
+      <button class="card-btn">Trigger Mandate Pull (₹10,000)</button>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">5. Liquidity Sweep Pool</span><span class="tag tag-blue">ZBA / TBA</span></div>
+        <div class="card-desc">End-of-day balance concentration sweep to optimize idle treasury yields.</div>
+      </div>
+      <button class="card-btn">Sweep Idle Float (₹75,000)</button>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">6. FX Cross-Border Rail</span><span class="tag tag-red">SWIFT Nostro</span></div>
+        <div class="card-desc">Outward remittance using Nostro mirror clearing with locked spot rates.</div>
+      </div>
+      <button class="card-btn">Dispatch Remit (₹1,20,000)</button>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">7. Setu AA Credit Flow</span><span class="tag tag-blue">Consent Rail</span></div>
+        <div class="card-desc">Real-time consent-backed statement pulls for algorithmic underwriting.</div>
+      </div>
+      <button class="card-btn">Pull Statement Consent</button>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">8. Marketplace Split</span><span class="tag tag-orange">Instant Split</span></div>
+        <div class="card-desc">Programmatic escrow commission separation and sub-merchant distribution.</div>
+      </div>
+      <button class="card-btn">Execute Split (₹40,000)</button>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-top"><span class="card-title">9. Statutory Tax Escrow</span><span class="tag tag-purple">PA/PG Safe</span></div>
+        <div class="card-desc">Automated 18% GST isolation into nodal clearing ledger under RBI norms.</div>
+      </div>
+      <button class="card-btn">Isolate Tax Sub-Ledger</button>
+    </div>
+  </div>
+
 </body>
 </html>
