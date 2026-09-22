@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 import httpx
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="TBG-CORE Enterprise Banking Engine", version="2.5.0")
@@ -868,4 +868,4 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui():
-    return HTML_TEMPLATE
+    return FileResponse("index.html")
