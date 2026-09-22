@@ -872,9 +872,9 @@ async def serve_ui():
 
 # --- MISSING CORE ENGINES 7, 8, 9 ---
 @app.post("/api/v1/services/account-aggregator", tags=["Core Operational Services"])
-async def setu_aa_consent_pull():
-    """Engine 7: Setu Account Aggregator consent artifact dispatch."""
-    return {"engine": "07_SETU_AA", "status": "CONSENT_ACTIVE", "consent_handle": "aa-req-9982-live"}
+async def aa_consent_pull():
+    """Engine 7: Account Aggregator consent artifact dispatch."""
+    return {"engine": "07_RBI_AA", "status": "CONSENT_ACTIVE", "consent_handle": "aa-req-9982-live"}
 
 @app.post("/api/v1/services/marketplace-split", tags=["Core Operational Services"])
 async def marketplace_split_settlement():

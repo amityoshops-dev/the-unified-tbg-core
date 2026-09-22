@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -248,7 +248,7 @@
     </div>
     <div class="nav-actions">
       <a href="/docs" target="_blank" class="nav-btn nav-btn-accent mono">OpenAPI Docs (/docs)</a>
-      <button class="nav-btn" onclick="location.reload()">↻ Sync</button>
+      <button class="nav-btn" onclick="location.reload()">? Sync</button>
     </div>
   </div>
 
@@ -268,23 +268,23 @@
   <div class="telemetry-row mono">
     <div class="metric-card">
       <div class="metric-label">Escrow Trust Pool</div>
-      <div class="metric-val">₹1,49,20,000</div>
-      <div class="metric-sub">• RERA Vault Active</div>
+      <div class="metric-val">?1,49,20,000</div>
+      <div class="metric-sub">� RERA Vault Active</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Treasury Float</div>
-      <div class="metric-val">₹73,49,150</div>
-      <div class="metric-sub">• 4 Accounts ZBA</div>
+      <div class="metric-val">?73,49,150</div>
+      <div class="metric-sub">� 4 Accounts ZBA</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">2PC Atomic Pool</div>
-      <div class="metric-val">₹49,75,000</div>
-      <div class="metric-sub">• 0 Uncommitted</div>
+      <div class="metric-val">?49,75,000</div>
+      <div class="metric-sub">� 0 Uncommitted</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Nostro FX Mirror</div>
       <div class="metric-val">,410.00</div>
-      <div class="metric-sub">• USD/INR Spot Lock</div>
+      <div class="metric-sub">� USD/INR Spot Lock</div>
     </div>
   </div>
 
@@ -305,9 +305,9 @@
         </div>
         <div class="card-desc">Milestone trust custody. Locks buyer funds in segregated nodal pool until cryptographic signoff.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('Escrow Lock', '₹50,000')">
-        <span>Dispatch Lock (₹50k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+      <button class="card-action-btn mono" onclick="triggerCall('Escrow Lock', '?50,000')">
+        <span>Dispatch Lock (?50k)</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -320,9 +320,9 @@
         </div>
         <div class="card-desc">Two-phase balance reservation clearing prevents duplicate debits during upstream bank timeouts.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('2PC Disbursal', '₹25,000')">
-        <span>Execute Payout (₹25k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+      <button class="card-action-btn mono" onclick="triggerCall('2PC Disbursal', '?25,000')">
+        <span>Execute Payout (?25k)</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -335,9 +335,9 @@
         </div>
         <div class="card-desc">Dynamic sub-account routing matching incoming RTGS/NEFT straight into invoice ledgers with 0 recon.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('VAN Credit', '₹15,000')">
-        <span>Collect Credit (₹15k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+      <button class="card-action-btn mono" onclick="triggerCall('VAN Credit', '?15,000')">
+        <span>Collect Credit (?15k)</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -350,9 +350,9 @@
         </div>
         <div class="card-desc">Automated recurring debits with NPCI mandate registration, presentation, and batch processing.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('e-NACH Debit', '₹10,000')">
-        <span>Trigger Pull (₹10k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+      <button class="card-action-btn mono" onclick="triggerCall('e-NACH Debit', '?10,000')">
+        <span>Trigger Pull (?10k)</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -365,9 +365,9 @@
         </div>
         <div class="card-desc">Automated EOD multi-entity balance concentration sweeps into master pool for yield optimization.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('Liquidity Sweep', '₹75,000')">
-        <span>Sweep Float (₹75k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+      <button class="card-action-btn mono" onclick="triggerCall('Liquidity Sweep', '?75,000')">
+        <span>Sweep Float (?75k)</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -380,9 +380,9 @@
         </div>
         <div class="card-desc">Multi-currency cross-border trade settlement with automated FX conversion and mirror ledgering.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('FX Remit', '₹1,20,000')">
+      <button class="card-action-btn mono" onclick="triggerCall('FX Remit', '?1,20,000')">
         <span>Dispatch Remit (.5k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -390,14 +390,14 @@
     <div class="service-card">
       <div>
         <div class="card-head">
-          <span class="card-title">7. Setu AA Credit Flow</span>
+          <span class="card-title">7. Account Aggregator Consent Flow</span>
           <span class="rail-pill pill-blue mono">Consent Rail</span>
         </div>
         <div class="card-desc">Consent-backed financial data pull via Account Aggregator for algorithmic real-time underwriting.</div>
       </div>
       <button class="card-action-btn mono" onclick="triggerCall('AA Consent Pull', 'FETCH')">
         <span>Pull Consent Data</span>
-        <span class="btn-status-indicator">● LIVE</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -410,9 +410,9 @@
         </div>
         <div class="card-desc">Programmatic revenue splitting with automated platform commission sequestering prior to payout.</div>
       </div>
-      <button class="card-action-btn mono" onclick="triggerCall('Marketplace Split', '₹40,000')">
-        <span>Execute Split (₹40k)</span>
-        <span class="btn-status-indicator">● LIVE</span>
+      <button class="card-action-btn mono" onclick="triggerCall('Marketplace Split', '?40,000')">
+        <span>Execute Split (?40k)</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
@@ -427,7 +427,7 @@
       </div>
       <button class="card-action-btn mono" onclick="triggerCall('Tax Isolation', '18% GST')">
         <span>Isolate Tax Sub-Ledger</span>
-        <span class="btn-status-indicator">● LIVE</span>
+        <span class="btn-status-indicator">? LIVE</span>
       </button>
     </div>
 
