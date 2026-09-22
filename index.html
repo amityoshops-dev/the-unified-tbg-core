@@ -4,136 +4,440 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TBG-CORE Enterprise Workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; }
-    body { background-color: #030712; color: #f8fafc; padding: 14px 20px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .brand { display: flex; align-items: center; gap: 8px; }
-    .dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block; }
-    .title { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; }
-    .badge { font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 6px; border-radius: 4px; }
-    .docs-btn { background: #0f172a; border: 1px solid #1e293b; color: #f8fafc; font-size: 11px; padding: 6px 12px; border-radius: 4px; text-decoration: none; }
-    
-    .console-box { background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; margin-bottom: 14px; }
-    .console-header { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
-    .input-row { display: flex; gap: 8px; margin-bottom: 6px; }
-    .console-input { flex: 1; background: #030712; border: 1px solid #1e293b; color: #e2e8f0; font-size: 11px; padding: 6px 10px; border-radius: 4px; }
-    .route-btn { background: #059669; color: #fff; border: none; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-    .status-text { font-size: 11px; color: #64748b; font-style: italic; }
+    :root {
+      --bg: #06090e;
+      --card-bg: #0c121c;
+      --card-border: #182234;
+      --card-border-hover: #2a3a55;
+      --accent: #10b981;
+      --accent-dim: rgba(16, 185, 129, 0.12);
+      --text-main: #f1f5f9;
+      --text-muted: #64748b;
+      --text-soft: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 16px 24px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
 
-    .grid-title { font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 10px; text-transform: uppercase; }
-    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .card { background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px; }
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-    .card-title { font-size: 12px; font-weight: 700; color: #f8fafc; }
-    .tag { font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: 600; }
-    .tag-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-    .tag-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-    .tag-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-    .tag-orange { background: rgba(249, 115, 22, 0.15); color: #f97316; }
-    .tag-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-    .card-desc { font-size: 10.5px; color: #64748b; line-height: 1.35; margin-bottom: 8px; }
-    .card-btn { width: 100%; background: #111c35; border: 1px solid #1e293b; color: #f8fafc; font-size: 10.5px; font-weight: 600; padding: 6px; border-radius: 4px; cursor: pointer; }
+    /* Top Navigation Bar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 14px;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #fff;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 5px;
+      letter-spacing: 0.5px;
+    }
+    .brand-title { font-size: 14px; font-weight: 700; letter-spacing: -0.2px; }
+    .badge-live {
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .badge-live::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .nav-actions { display: flex; gap: 8px; align-items: center; }
+    .nav-btn {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text-soft);
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover { color: #fff; border-color: #334155; }
+    .nav-btn-accent {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    /* AI Router Bar */
+    .router-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+    .router-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .router-input-box { display: flex; gap: 8px; }
+    .router-input {
+      flex: 1;
+      background: #06090e;
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: 7px 12px;
+      font-size: 11.5px;
+      color: #e2e8f0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .router-input:focus { outline: none; border-color: #38bdf8; }
+    .btn-route {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 0 16px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-route:hover { background: #1d4ed8; }
+
+    /* Telemetry Metrics Bar */
+    .telemetry-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 8px 12px;
+    }
+    .metric-label { font-size: 9.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    .metric-val { font-size: 15px; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+    .metric-sub { font-size: 9.5px; color: var(--accent); margin-top: 2px; }
+
+    /* 3x3 Operational Services Grid */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .grid-3x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 118px;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .service-card:hover {
+      border-color: var(--card-border-hover);
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rail-pill {
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+    .pill-green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .pill-blue { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+    .pill-purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+    .pill-orange { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+    .pill-pink { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
+    .pill-amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+    .card-desc {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-bottom: 9px;
+    }
+    .card-action-btn {
+      width: 100%;
+      background: #111a28;
+      border: 1px solid #1e2c42;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s;
+    }
+    .card-action-btn:hover {
+      background: #172439;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .card-action-btn:active { transform: scale(0.99); }
+    .btn-status-indicator { font-size: 8px; color: var(--accent); }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="brand">
-      <span class="dot"></span>
-      <span class="title">THE UNIFIED TBG-CORE</span>
-      <span class="badge">ALL 9 ENGINES ACTIVE</span>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="brand-wrap">
+      <span class="brand-logo">TBG</span>
+      <span class="brand-title">TBG-CORE Enterprise Workbench</span>
+      <span class="badge-live mono">9 RAILS OPERATIONAL</span>
     </div>
-    <a href="/docs" class="docs-btn">Open API Specs (/docs)</a>
+    <div class="nav-actions">
+      <a href="/docs" target="_blank" class="nav-btn nav-btn-accent mono">OpenAPI Docs (/docs)</a>
+      <button class="nav-btn" onclick="location.reload()">↻ Sync</button>
+    </div>
   </div>
 
-  <div class="console-box">
-    <div class="console-header">
+  <!-- Router Console -->
+  <div class="router-section">
+    <div class="router-header">
       <span>AI Agent Rail Routing Console</span>
-      <span>Simulates natural language parsing</span>
+      <span class="mono" style="color: var(--accent);">LATENCY: 42ms</span>
     </div>
-    <div class="input-row">
-      <input type="text" class="console-input" value="Client needs to debit 10000 loan EMI every month on 5th via bank mandate" />
-      <button class="route-btn">Route Query</button>
-    </div>
-    <div class="status-text">Ready for query resolution...</div>
-  </div>
-
-  <div class="grid-title">9 Core Operational Services</div>
-
-  <div class="services-grid">
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">1. Escrow Multi-Sig</span><span class="tag tag-green">2-of-3 Safe</span></div>
-        <div class="card-desc">Milestone trust custody. Locks buyer funds until conditions clear.</div>
-      </div>
-      <button class="card-btn">Dispatch Lock (₹50,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">2. 2PC Bulk Disbursals</span><span class="tag tag-blue">IMPS/RTGS</span></div>
-        <div class="card-desc">Two-phase reservation preventing double-spend during bank timeouts.</div>
-      </div>
-      <button class="card-btn">Execute Payout (₹25,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">3. Virtual Accounts (CMS)</span><span class="tag tag-purple">Smart VAN</span></div>
-        <div class="card-desc">Dynamic VAN collections with automated 1:1 invoice ledger mapping.</div>
-      </div>
-      <button class="card-btn">Collect VAN Credit (₹15,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">4. e-NACH Standing Orders</span><span class="tag tag-orange">NPCI Rail</span></div>
-        <div class="card-desc">Auto-debit recurring mandates from bank accounts on schedule dates.</div>
-      </div>
-      <button class="card-btn">Trigger Mandate Pull (₹10,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">5. Liquidity Sweep Pool</span><span class="tag tag-blue">ZBA / TBA</span></div>
-        <div class="card-desc">End-of-day balance concentration sweep to optimize idle treasury yields.</div>
-      </div>
-      <button class="card-btn">Sweep Idle Float (₹75,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">6. FX Cross-Border Rail</span><span class="tag tag-red">SWIFT Nostro</span></div>
-        <div class="card-desc">Outward remittance using Nostro mirror clearing with locked spot rates.</div>
-      </div>
-      <button class="card-btn">Dispatch Remit (₹1,20,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">7. Setu AA Credit Flow</span><span class="tag tag-blue">Consent Rail</span></div>
-        <div class="card-desc">Real-time consent-backed statement pulls for algorithmic underwriting.</div>
-      </div>
-      <button class="card-btn">Pull Statement Consent</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">8. Marketplace Split</span><span class="tag tag-orange">Instant Split</span></div>
-        <div class="card-desc">Programmatic escrow commission separation and sub-merchant distribution.</div>
-      </div>
-      <button class="card-btn">Execute Split (₹40,000)</button>
-    </div>
-
-    <div class="card">
-      <div>
-        <div class="card-top"><span class="card-title">9. Statutory Tax Escrow</span><span class="tag tag-purple">PA/PG Safe</span></div>
-        <div class="card-desc">Automated 18% GST isolation into nodal clearing ledger under RBI norms.</div>
-      </div>
-      <button class="card-btn">Isolate Tax Sub-Ledger</button>
+    <div class="router-input-box">
+      <input type="text" class="router-input" id="intentInput" value="Client needs to debit 10000 loan EMI every month on 5th via bank mandate" />
+      <button class="btn-route" onclick="alert('Routed to Rail 4 (e-NACH Standing Orders)')">Route Query</button>
     </div>
   </div>
+
+  <!-- Telemetry Row -->
+  <div class="telemetry-row mono">
+    <div class="metric-card">
+      <div class="metric-label">Escrow Trust Pool</div>
+      <div class="metric-val">₹1,49,20,000</div>
+      <div class="metric-sub">• RERA Vault Active</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Treasury Float</div>
+      <div class="metric-val">₹73,49,150</div>
+      <div class="metric-sub">• 4 Accounts ZBA</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">2PC Atomic Pool</div>
+      <div class="metric-val">₹49,75,000</div>
+      <div class="metric-sub">• 0 Uncommitted</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Nostro FX Mirror</div>
+      <div class="metric-val">,410.00</div>
+      <div class="metric-sub">• USD/INR Spot Lock</div>
+    </div>
+  </div>
+
+  <!-- 3x3 Grid of 9 Institutional Services -->
+  <div class="section-title">
+    <span>Institutional Payment & Ledger Services Suite</span>
+    <span class="mono" style="font-size: 10px;">Grid: 3x3 Auto-Balanced</span>
+  </div>
+
+  <div class="grid-3x3">
+
+    <!-- 1 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">1. Escrow Multi-Sig</span>
+          <span class="rail-pill pill-green mono">2-of-3 Safe</span>
+        </div>
+        <div class="card-desc">Milestone trust custody. Locks buyer funds in segregated nodal pool until cryptographic signoff.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('Escrow Lock', '₹50,000')">
+        <span>Dispatch Lock (₹50k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 2 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">2. 2PC Bulk Disbursals</span>
+          <span class="rail-pill pill-blue mono">IMPS/RTGS</span>
+        </div>
+        <div class="card-desc">Two-phase balance reservation clearing prevents duplicate debits during upstream bank timeouts.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('2PC Disbursal', '₹25,000')">
+        <span>Execute Payout (₹25k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 3 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">3. Virtual Accounts (CMS)</span>
+          <span class="rail-pill pill-purple mono">Smart VAN</span>
+        </div>
+        <div class="card-desc">Dynamic sub-account routing matching incoming RTGS/NEFT straight into invoice ledgers with 0 recon.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('VAN Credit', '₹15,000')">
+        <span>Collect Credit (₹15k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 4 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">4. e-NACH Standing Orders</span>
+          <span class="rail-pill pill-orange mono">NPCI Mandate</span>
+        </div>
+        <div class="card-desc">Automated recurring debits with NPCI mandate registration, presentation, and batch processing.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('e-NACH Debit', '₹10,000')">
+        <span>Trigger Pull (₹10k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 5 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">5. Liquidity Sweep Pool</span>
+          <span class="rail-pill pill-blue mono">ZBA / TBA</span>
+        </div>
+        <div class="card-desc">Automated EOD multi-entity balance concentration sweeps into master pool for yield optimization.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('Liquidity Sweep', '₹75,000')">
+        <span>Sweep Float (₹75k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 6 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">6. Cross-Border FX Nostro</span>
+          <span class="rail-pill pill-pink mono">SWIFT MT103</span>
+        </div>
+        <div class="card-desc">Multi-currency cross-border trade settlement with automated FX conversion and mirror ledgering.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('FX Remit', '₹1,20,000')">
+        <span>Dispatch Remit (.5k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 7 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">7. Setu AA Credit Flow</span>
+          <span class="rail-pill pill-blue mono">Consent Rail</span>
+        </div>
+        <div class="card-desc">Consent-backed financial data pull via Account Aggregator for algorithmic real-time underwriting.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('AA Consent Pull', 'FETCH')">
+        <span>Pull Consent Data</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 8 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">8. Marketplace Split</span>
+          <span class="rail-pill pill-amber mono">Instant Split</span>
+        </div>
+        <div class="card-desc">Programmatic revenue splitting with automated platform commission sequestering prior to payout.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('Marketplace Split', '₹40,000')">
+        <span>Execute Split (₹40k)</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+    <!-- 9 -->
+    <div class="service-card">
+      <div>
+        <div class="card-head">
+          <span class="card-title">9. Statutory Tax Escrow</span>
+          <span class="rail-pill pill-purple mono">PA/PG Safe</span>
+        </div>
+        <div class="card-desc">Automated 18% GST liability sequestering into nodal escrow sub-ledgers compliant with RBI directions.</div>
+      </div>
+      <button class="card-action-btn mono" onclick="triggerCall('Tax Isolation', '18% GST')">
+        <span>Isolate Tax Sub-Ledger</span>
+        <span class="btn-status-indicator">● LIVE</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    function triggerCall(service, amount) {
+      alert("Dispatched to Engine: " + service + " | Payload: " + amount + " | Execution: 200 OK");
+    }
+  </script>
 
 </body>
 </html>
