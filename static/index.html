@@ -1,14 +1,358 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>tbg-ui</title>
-    <script type="module" crossorigin src="/assets/index-CpJHOpcm.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-B816yaXi.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TBG-CORE Engine \u2014 Enterprise Workbench</title>
+<style>
+    :root {
+        --navy: #0F2A5C; --navy2: #1B4CA0; --bg: #F4F6FA; --card: #FFFFFF;
+        --border: #E4E8F0; --text: #0F2A44; --sub: #6B7690; --green: #0F7A45;
+        --green-bg: #E7F8EF; --green-border: #B8ECD0;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 22px; }
+
+    .header { display:flex; align-items:center; justify-content:space-between; background:var(--card);
+        border:1px solid var(--border); border-radius:14px; padding:18px 26px; margin-bottom:18px;
+        box-shadow:0 1px 3px rgba(16,24,40,0.06); flex-wrap:wrap; gap:12px; }
+    .logo-box { display:flex; align-items:center; gap:14px; }
+    .logo-badge { background:linear-gradient(135deg,var(--navy),var(--navy2)); color:white; font-weight:800;
+        font-size:15px; padding:10px 12px; border-radius:10px; }
+    .title { font-size:20px; font-weight:700; margin:0; }
+    .subtitle { font-size:12.5px; color:var(--sub); margin:2px 0 0 0; }
+    .pill { background:var(--green-bg); color:var(--green); border:1px solid var(--green-border);
+        padding:6px 14px; border-radius:999px; font-size:12.5px; font-weight:700; white-space:nowrap; }
+    .header-links a { font-size:12.5px; color:var(--navy2); text-decoration:none; margin-left:14px; font-weight:600; }
+
+    .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+    .metric { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 18px;
+        box-shadow:0 1px 3px rgba(16,24,40,0.05); }
+    .metric-label { font-size:11.5px; color:#8792A6; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .metric-value { font-size:21px; font-weight:800; margin-top:2px; }
+    .metric-sub { font-size:11.5px; color:#8B98B0; margin-top:4px; }
+
+    .panel { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px;
+        box-shadow:0 1px 3px rgba(16,24,40,0.05); margin-bottom:18px; }
+    .panel h3 { margin:0 0 4px 0; font-size:16px; }
+    .panel .hint { font-size:12.5px; color:var(--sub); margin-bottom:14px; }
+
+    .route-row { display:flex; gap:10px; }
+    .route-row input[type=text] { flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:13.5px; }
+    button { cursor:pointer; border:1px solid var(--border); background:#F7F9FC; border-radius:8px;
+        padding:9px 16px; font-weight:600; font-size:13px; color:var(--text); }
+    button.primary { background:var(--navy); border-color:var(--navy); color:white; }
+    button.primary:hover { background:var(--navy2); }
+    button:hover { filter:brightness(0.97); }
+    button:disabled { opacity:0.55; cursor:default; }
+
+    #routeResult { margin-top:14px; display:none; }
+    .badge { display:inline-block; color:white; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; }
+
+    .grid-title { font-size:15px; font-weight:700; margin: 6px 2px 12px 2px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+    @media (max-width: 980px) { .grid { grid-template-columns:1fr 1fr; } .metrics { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 620px) { .grid { grid-template-columns:1fr; } .metrics { grid-template-columns:1fr; } }
+
+    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 1px 3px rgba(16,24,40,0.05); display:flex; flex-direction:column; }
+    .card-title { font-size:15px; font-weight:700; margin:8px 0 2px 0; }
+    .card-desc { font-size:12px; color:var(--sub); line-height:1.4; margin-bottom:10px; min-height:48px; }
+    .card label { font-size:11.5px; color:var(--sub); font-weight:600; display:block; margin:8px 0 3px 0; }
+    .card input[type=number], .card input[type=text] { width:100%; padding:7px 9px; border:1px solid var(--border); border-radius:6px; font-size:13px; }
+    .row2 { display:flex; gap:8px; }
+    .row2 > * { flex:1; }
+    .sig-row { display:flex; gap:6px; margin:8px 0; font-size:11.5px; }
+    .sig-row label { display:flex; align-items:center; gap:4px; margin:0; font-weight:500; color:var(--text); }
+    .card button { margin-top:10px; width:100%; }
+    .card-result { margin-top:10px; font-size:11.5px; padding:8px 10px; border-radius:6px; display:none; word-break:break-word; }
+    .card-result.ok { display:block; background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+    .card-result.err { display:block; background:#FDECEC; color:#B42318; border:1px solid #F4C6C0; }
+
+    table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); }
+    th { color:#8792A6; font-weight:700; text-transform:uppercase; font-size:10.5px; letter-spacing:.03em; }
+    tr:hover { background:#FAFBFD; }
+    .status-chip { padding:2px 8px; border-radius:999px; font-size:10.5px; font-weight:700; }
+    .status-ok { background:var(--green-bg); color:var(--green); }
+    .status-warn { background:#FFF4E5; color:#B45309; }
+    .status-err { background:#FDECEC; color:#B42318; }
+
+    .footer { text-align:center; font-size:11.5px; color:#9BA5BC; margin: 20px 0 8px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="header">
+        <div class="logo-box">
+            <div class="logo-badge">TBG</div>
+            <div>
+                <p class="title">TBG-CORE Enterprise Workbench</p>
+                <p class="subtitle">Institutional Payment &amp; Ledger Orchestration &middot; Live Simulation Engine</p>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:14px;">
+            <span class="pill" id="statusPill">\u25cf CONNECTING\u2026</span>
+            <span class="header-links"><a href="/docs" target="_blank">API Docs \u2192</a></span>
+        </div>
+    </div>
+
+    <div class="metrics" id="metrics">
+        <div class="metric"><div class="metric-label">Escrow Trust Pool</div><div class="metric-value" id="m-escrow">\u2014</div><div class="metric-sub">RERA-style vault, simulated</div></div>
+        <div class="metric"><div class="metric-label">Treasury Float</div><div class="metric-value" id="m-treasury">\u2014</div><div class="metric-sub">4 linked accounts (ZBA)</div></div>
+        <div class="metric"><div class="metric-label">2PC Atomic Pool</div><div class="metric-value" id="m-2pc">\u2014</div><div class="metric-sub">In-flight reservations</div></div>
+        <div class="metric"><div class="metric-label">Nostro FX Mirror</div><div class="metric-value" id="m-fx">\u2014</div><div class="metric-sub">USD/INR spot lock</div></div>
+    </div>
+
+    <div class="panel">
+        <h3>\U0001F9ED AI Agent Rail Routing Console</h3>
+        <div class="hint">Describe an operations need in plain English \u2014 the live agent picks the rail and explains why.</div>
+        <div class="route-row">
+            <input type="text" id="routeQuery" value="Client needs to debit 10000 loan EMI every month on the 5th via bank mandate" />
+            <button class="primary" onclick="routeQuery()">Route Query</button>
+        </div>
+        <div id="routeResult"></div>
+    </div>
+
+    <div class="grid-title">Institutional Payment &amp; Ledger Services Suite \u2014 9 Live Rails</div>
+    <div class="grid" id="serviceGrid"></div>
+
+    <div class="panel">
+        <h3>Transaction Ledger</h3>
+        <div class="hint">Live feed from this server's in-memory ledger \u2014 the same one Postman and <code>/docs</code> read/write.</div>
+        <table>
+            <thead><tr><th>Time</th><th>Rail</th><th>Action</th><th>Amount</th><th>Status</th><th>Detail</th></tr></thead>
+            <tbody id="ledgerBody"><tr><td colspan="6" style="color:#9BA5BC;">Loading\u2026</td></tr></tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        TBG-CORE Engine \u2014 educational simulation environment. No real bank, NPCI, RTGS/IMPS, SWIFT or AA
+        infrastructure is connected. Balances, mandates and FX rates are generated in-process for demonstration.
+    </div>
+</div>
+
+<script>
+const fmtINR = n => "\u20b9" + Number(n).toLocaleString("en-IN", {maximumFractionDigits:0});
+const fmtUSD = n => "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+
+async function api(method, path, body) {
+    const res = await fetch(path, {
+        method, headers: body ? {"Content-Type":"application/json"} : {},
+        body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    return data;
+}
+
+async function refreshMetrics() {
+    try {
+        const cat = await api("GET", "/api/v1/services/catalog");
+        document.getElementById("m-escrow").textContent = fmtINR(cat.pools.escrow_trust_pool);
+        document.getElementById("m-treasury").textContent = fmtINR(cat.pools.treasury_float);
+        document.getElementById("m-2pc").textContent = fmtINR(cat.pools.atomic_pool_2pc);
+        document.getElementById("m-fx").textContent = fmtUSD(cat.pools.nostro_fx_mirror_usd);
+        document.getElementById("statusPill").textContent = "\u25cf SIMULATION MODE \u00b7 9 RAILS LIVE";
+    } catch (e) {
+        document.getElementById("statusPill").textContent = "\u25cf DISCONNECTED";
+    }
+}
+
+async function refreshLedger() {
+    try {
+        const data = await api("GET", "/api/v1/transactions?limit=12");
+        const rows = data.transactions.map(t => {
+            const cls = t.status.includes("FAIL") || t.status.includes("ROLLED") ? "status-warn"
+                       : t.status.includes("ERR") ? "status-err" : "status-ok";
+            const time = new Date(t.time).toLocaleTimeString();
+            const amt = t.currency === "USD" ? fmtUSD(t.amount) : fmtINR(t.amount);
+            return `<tr><td>${time}</td><td>${t.service}</td><td>${t.action}</td><td>${amt}</td>
+                     <td><span class="status-chip ${cls}">${t.status}</span></td><td>${t.detail||""}</td></tr>`;
+        }).join("");
+        document.getElementById("ledgerBody").innerHTML = rows || `<tr><td colspan="6" style="color:#9BA5BC;">No transactions yet.</td></tr>`;
+    } catch (e) { /* ignore */ }
+}
+
+async function refreshAll() { await refreshMetrics(); await refreshLedger(); }
+
+async function routeQuery() {
+    const q = document.getElementById("routeQuery").value.trim();
+    if (!q) return;
+    const box = document.getElementById("routeResult");
+    box.style.display = "block";
+    box.innerHTML = "Routing\u2026";
+    try {
+        const r = await api("POST", "/api/v1/ai/route", {query: q});
+        if (!r.service_id) {
+            box.innerHTML = `<div class="card-result err" style="display:block;">${r.reasoning || "No confident match."}</div>`;
+            return;
+        }
+        box.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                <div>
+                    <span class="badge" style="background:${SERVICES.find(s=>s.id===r.service_id).color}">${SERVICES.find(s=>s.id===r.service_id).tag}</span>
+                    <b> ${SERVICES.find(s=>s.id===r.service_id).name}</b>
+                    <div style="color:var(--sub); font-size:12.5px; margin-top:4px;">${r.reasoning || ""} &middot; routed by ${r.engine}</div>
+                </div>
+                <button class="primary" onclick="executeRouted('${r.service_id}')">Execute via routed rail</button>
+            </div>`;
+    } catch (e) {
+        box.innerHTML = `<div class="card-result err" style="display:block;">${e.message}</div>`;
+    }
+}
+
+async function executeRouted(serviceId) {
+    try {
+        await api("POST", "/api/v1/engine/execute", {service_id: serviceId, params: {}});
+        await refreshAll();
+    } catch (e) { alert(e.message); }
+}
+
+// ---- Service definitions + card renderers ----
+const SERVICES = [
+    {id:"escrow", name:"Escrow Multi-Sig", tag:"2-of-3 Safe", color:"#2563EB",
+     desc:"Milestone trust custody. Locks buyer funds in a segregated nodal pool until cryptographic signoff."},
+    {id:"2pc", name:"2PC Bulk Disbursals", tag:"IMPS/RTGS", color:"#16A34A",
+     desc:"Two-phase balance reservation clearing that prevents duplicate debits during upstream bank timeouts."},
+    {id:"va", name:"Virtual Accounts (CMS)", tag:"Smart VAN", color:"#7C3AED",
+     desc:"Dynamic sub-account routing that matches incoming credit straight into invoice ledgers."},
+    {id:"enach", name:"e-NACH Standing Orders", tag:"NPCI Mandate", color:"#EA580C",
+     desc:"Automated recurring debits with NPCI mandate registration and presentation cycles."},
+    {id:"sweep", name:"Liquidity Sweep Pool", tag:"ZBA/TBA", color:"#0891B2",
+     desc:"Automated EOD multi-entity balance concentration sweeps into the master pool."},
+    {id:"fx", name:"Cross-Border FX Nostro", tag:"SWIFT MT103", color:"#DB2777",
+     desc:"Multi-currency cross-border settlement with automated FX conversion and mirror ledgering."},
+    {id:"aa", name:"Account Aggregator Consent Flow", tag:"Consent Rail", color:"#4338CA",
+     desc:"Consent-backed financial data pull via Account Aggregator for algorithmic underwriting."},
+    {id:"split", name:"Marketplace Split", tag:"Instant Split", color:"#CA8A04",
+     desc:"Programmatic revenue splitting with automated platform commission sequestering."},
+    {id:"gst", name:"Statutory Tax Escrow", tag:"PA/PG Safe", color:"#9333EA",
+     desc:"Automated 18% GST liability sequestering into nodal escrow sub-ledgers."},
+];
+
+let lastMandateId = null;
+
+function cardShell(svc, bodyHtml) {
+    return `<div class="card">
+        <span class="badge" style="background:${svc.color}">${svc.tag}</span>
+        <div class="card-title">${svc.name}</div>
+        <div class="card-desc">${svc.desc}</div>
+        ${bodyHtml}
+        <div class="card-result" id="res-${svc.id}"></div>
+    </div>`;
+}
+
+function showResult(id, ok, text) {
+    const el = document.getElementById("res-" + id);
+    el.className = "card-result " + (ok ? "ok" : "err");
+    el.textContent = text;
+}
+
+function renderGrid() {
+    const g = document.getElementById("serviceGrid");
+    g.innerHTML = SERVICES.map(svc => {
+        if (svc.id === "escrow") return cardShell(svc, `
+            <label>Milestone amount (\u20b9)</label>
+            <input type="number" id="escrow_amt" value="50000">
+            <button onclick="doEscrowLock()">Dispatch Lock</button>
+            <div class="sig-row">
+                <label><input type="checkbox" id="sig1">Sig 1</label>
+                <label><input type="checkbox" id="sig2">Sig 2</label>
+                <label><input type="checkbox" id="sig3">Sig 3</label>
+            </div>
+            <button onclick="doEscrowRelease()">Release Escrow</button>`);
+        if (svc.id === "2pc") return cardShell(svc, `
+            <label>Disbursal amount (\u20b9)</label>
+            <input type="number" id="2pc_amt" value="25000">
+            <label><input type="checkbox" id="2pc_timeout"> Force bank timeout</label>
+            <button onclick="do2pc()">Execute Payout</button>`);
+        if (svc.id === "va") return cardShell(svc, `
+            <label>Collection amount (\u20b9)</label>
+            <input type="number" id="va_amt" value="15000">
+            <label>Invoice label</label>
+            <input type="text" id="va_inv" value="INV-1042">
+            <button onclick="doVA()">Collect Credit</button>`);
+        if (svc.id === "enach") return cardShell(svc, `
+            <label>EMI amount (\u20b9)</label>
+            <input type="number" id="enach_amt" value="10000">
+            <button onclick="doEnachRegister()">Register Mandate</button>
+            <label style="margin-top:10px;">Mandate ID</label>
+            <input type="text" id="enach_mid" placeholder="auto-filled after register">
+            <button onclick="doEnachTrigger()">Trigger Pull</button>`);
+        if (svc.id === "sweep") return cardShell(svc, `
+            <div class="hint" style="margin:8px 0 0 0;">Sweeps 4 simulated linked sub-accounts into Treasury Float.</div>
+            <button onclick="doSweep()">Sweep Float</button>`);
+        if (svc.id === "fx") return cardShell(svc, `
+            <label>Remit amount (USD)</label>
+            <input type="number" id="fx_amt" value="500">
+            <button onclick="doFX()">Dispatch Remit</button>`);
+        if (svc.id === "aa") return cardShell(svc, `
+            <label><input type="checkbox" id="aa_consent"> Customer has granted AA consent</label>
+            <label>Purpose</label>
+            <input type="text" id="aa_purpose" value="Algorithmic underwriting">
+            <button onclick="doAA()">Pull Consent Data</button>`);
+        if (svc.id === "split") return cardShell(svc, `
+            <label>Gross transaction (\u20b9)</label>
+            <input type="number" id="split_gross" value="20000">
+            <label>Commission %</label>
+            <input type="number" id="split_pct" value="10">
+            <button onclick="doSplit()">Execute Instant Split</button>`);
+        if (svc.id === "gst") return cardShell(svc, `
+            <label>Transaction value (\u20b9)</label>
+            <input type="number" id="gst_amt" value="100000">
+            <button onclick="doGST()">Sequester GST</button>`);
+        return "";
+    }).join("");
+}
+
+async function safeCall(id, fn) {
+    try {
+        const r = await fn();
+        showResult(id, true, JSON.stringify(r));
+        await refreshAll();
+    } catch (e) {
+        showResult(id, false, e.message);
+    }
+}
+
+function doEscrowLock() { const amt = +document.getElementById("escrow_amt").value;
+    safeCall("escrow", () => api("POST","/api/v1/services/escrow-multisig",{action:"lock",amount:amt})); }
+function doEscrowRelease() { const amt = +document.getElementById("escrow_amt").value;
+    const sigs = ["sig1","sig2","sig3"].filter(id => document.getElementById(id).checked).length;
+    safeCall("escrow", () => api("POST","/api/v1/services/escrow-multisig",{action:"release",amount:amt,signatures:sigs})); }
+function do2pc() { const amt = +document.getElementById("2pc_amt").value;
+    const timeout = document.getElementById("2pc_timeout").checked;
+    safeCall("2pc", () => api("POST","/api/v1/services/bulk-disbursal",{amount:amt,force_timeout:timeout})); }
+function doVA() { const amt = +document.getElementById("va_amt").value;
+    const inv = document.getElementById("va_inv").value;
+    safeCall("va", () => api("POST","/api/v1/services/virtual-account",{amount:amt,invoice_id:inv})); }
+function doEnachRegister() { const amt = +document.getElementById("enach_amt").value;
+    safeCall("enach", async () => {
+        const r = await api("POST","/api/v1/services/enach-mandate",{action:"register",amount:amt,frequency_days:30});
+        lastMandateId = r.mandate_id;
+        document.getElementById("enach_mid").value = r.mandate_id;
+        return r;
+    }); }
+function doEnachTrigger() { const mid = document.getElementById("enach_mid").value || lastMandateId;
+    if (!mid) { showResult("enach", false, "Register a mandate first."); return; }
+    safeCall("enach", () => api("POST","/api/v1/services/enach-mandate",{action:"trigger",mandate_id:mid})); }
+function doSweep() { safeCall("sweep", () => api("POST","/api/v1/services/liquidity-sweep")); }
+function doFX() { const amt = +document.getElementById("fx_amt").value;
+    safeCall("fx", () => api("POST","/api/v1/services/fx-nostro",{amount_usd:amt})); }
+function doAA() { const consent = document.getElementById("aa_consent").checked;
+    const purpose = document.getElementById("aa_purpose").value;
+    safeCall("aa", () => api("POST","/api/v1/services/account-aggregator",{consent_granted:consent,purpose:purpose})); }
+function doSplit() { const gross = +document.getElementById("split_gross").value;
+    const pct = +document.getElementById("split_pct").value;
+    safeCall("split", () => api("POST","/api/v1/services/marketplace-split",{gross_amount:gross,commission_pct:pct})); }
+function doGST() { const amt = +document.getElementById("gst_amt").value;
+    safeCall("gst", () => api("POST","/api/v1/services/gst-statutory-escrow",{transaction_amount:amt})); }
+
+renderGrid();
+refreshAll();
+setInterval(refreshAll, 8000);
+</script>
+</body>
 </html>
