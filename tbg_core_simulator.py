@@ -1,12 +1,12 @@
-import os, uuid, json, hashlib
+import os, uuid, json
 from datetime import datetime, timezone
-from decimal import Decimal
 from dotenv import load_dotenv
 load_dotenv()
 
 import streamlit as st
 
-APP_VERSION = "1.0.0"
+RUPEE = "\u20B9"
+
 RAILS = {
     "NACH": {"purpose":"Recurring mandate-based collections","message":"Debit instruction / mandate lifecycle","settlement":"Batch / clearing cycle"},
     "UPI": {"purpose":"Real-time account-to-account payment","message":"UPI payment intent / collect simulation","settlement":"Real-time"},
@@ -19,8 +19,6 @@ RAILS = {
     "FX": {"purpose":"Cross-border / treasury FX simulation","message":"FX instruction and rate lock","settlement":"Corridor dependent"},
 }
 
-DEFAULT_POOL = {"escrow":14920000.0, "treasury":7349150.0, "atomic":4975000.0, "nostro":410.0}
-
 st.set_page_config(page_title="TBG-CORE Workbench", page_icon="TBG", layout="wide", initial_sidebar_state="expanded")
 
 def now():
@@ -28,12 +26,6 @@ def now():
 
 def txid():
     return "TBG-" + uuid.uuid4().hex[:12].upper()
-
-def add_audit(event, tx, detail, state):
-    st.session_state.setdefault("audit", []).append({
-        "time": now(), "transaction_id": tx, "event": event,
-        "state": state, "detail": detail
-    })
 
 def classify(req):
     x = req.lower()
@@ -103,8 +95,7 @@ def execute(req, amount, currency):
 
 if "result" not in st.session_state: st.session_state.result = None
 if "audit" not in st.session_state: st.session_state.audit = []
-
-RUPEE = "\u20B9"
+if "view" not in st.session_state: st.session_state.view = "landing"
 
 st.markdown("""
 <style>
@@ -112,89 +103,130 @@ st.markdown("""
 .tbg-header {background:linear-gradient(90deg,#102f6b,#174a9c); color:white; padding:18px 24px; border-radius:14px; margin-bottom:16px;}
 .tbg-title {font-size:27px;font-weight:750;}
 .tbg-sub {font-size:14px;opacity:.88;margin-top:4px;}
-.badge {display:inline-block;padding:7px 12px;border-radius:20px;background:#e8f7ef;color:#087443;font-weight:700;font-size:12px;}
 .step {padding:13px 15px;border:1px solid #dfe5ee;border-radius:10px;background:#fff;margin:7px 0;}
 .step b {color:#173b72;}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="tbg-header">
-<div class="tbg-title">TBG-CORE</div>
-<div class="tbg-sub">Institutional Payment &amp; Ledger Orchestration Workbench &middot; Enterprise Demo Build</div>
-</div>
-""", unsafe_allow_html=True)
+# ============== LANDING / SIMPLE SIMULATOR VIEW ==============
+if st.session_state.view == "landing":
+    st.markdown("""
+    <div class="tbg-header">
+    <div class="tbg-title">TBG-CORE</div>
+    <div class="tbg-sub">Institutional Payment &amp; Ledger Orchestration Simulator</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-tabs = st.tabs([
-    "Command Center","Simulator","Products","Architecture","API Lab","API Docs",
-    "Postman","PRD","LLM Lab","Sandbox","Audit"
-])
-
-with tabs[0]:
-    c1,c2,c3,c4 = st.columns(4)
-    c1.metric("Escrow Trust Pool", f"{RUPEE}14,920,000")
-    c2.metric("Treasury Float", f"{RUPEE}7,349,150")
-    c3.metric("2PC Atomic Pool", f"{RUPEE}4,975,000")
-    c4.metric("Nostro FX Mirror","$410")
-    st.subheader("Banking execution lifecycle")
-    steps = [
-        ("01","Business Requirement","Capture the operational need in business language."),
-        ("02","Requirement Normalization","Convert narrative into amount, currency, frequency, parties and constraints."),
-        ("03","AI / Rules Interpretation","Classify intent and identify candidate payment rails."),
-        ("04","Candidate Rail Discovery","Compare eligible rails against the requirement."),
-        ("05","Rail Selection","Select the deterministic rail after rules validation."),
-        ("06","Eligibility Validation","Validate account, mandate, beneficiary, currency and transaction constraints."),
-        ("07","Compliance / Policy Checks","Run simulated policy gates; production KYC/AML is not represented."),
-        ("08","Idempotency / Risk / Limits","Prevent duplicates and check configured simulation limits."),
-        ("09","Liquidity / Pool Check","Confirm the required simulated pool can support the transaction."),
-        ("10","Transaction Initiation","Create transaction and correlation identifiers."),
-        ("11","Message Construction","Build the rail-specific instruction/message."),
-        ("12","Rail Adapter Submission","Send to simulated or configured sandbox adapter."),
-        ("13","Provider Acknowledgement","Receive acceptance/acknowledgement."),
-        ("14","State Transition","Move through the transaction state machine."),
-        ("15","Ledger Impact","Post balanced simulated debit/credit entries."),
-        ("16","Pool Movement","Reserve/release the relevant liquidity pool."),
-        ("17","Settlement","Simulate settlement and value movement."),
-        ("18","Reconciliation","Match transaction, provider reference and ledger."),
-        ("19","Exception / Retry","Evaluate failures, retry or compensation path."),
-        ("20","Final State","Mark simulated success/failure."),
-        ("21","Audit","Persist the complete event chain for traceability."),
-        ("22","Operational Metrics","Expose latency, status and control outcomes.")
-    ]
-    for n,title,desc in steps:
-        st.markdown(f'<div class="step"><b>{n} &middot; {title}</b><br>{desc}</div>', unsafe_allow_html=True)
-
-with tabs[1]:
     st.subheader("Transaction Simulator")
     req = st.text_area("Business requirement", value=f"Client needs to debit {RUPEE}10,000 loan EMI every month on the 5th via bank mandate", height=90)
     a,b,c = st.columns(3)
     amount = a.number_input("Amount", min_value=1.0, value=10000.0, step=100.0)
     currency = b.selectbox("Currency",["INR","USD","EUR"])
     mode = c.selectbox("Mode",["SIMULATION","SANDBOX"])
+
     if st.button("Execute TBG-CORE Lifecycle", type="primary"):
         st.session_state.result = execute(req, amount, currency)
         st.session_state.audit.extend(st.session_state.result["audit"])
         st.rerun()
+
     if st.session_state.result:
-        r=st.session_state.result
+        r = st.session_state.result
         st.success(f"{r['status']} · {r['transaction_id']}")
         st.write(f"Intent: **{r['intent']}** | Rail: **{r['rail']}** | Pool: **{r['pool']}**")
         st.subheader("Execution trace")
         for e in r["audit"]:
             st.markdown(f"**{e['event']}** · `{e['state']}` — {e['detail']}")
 
-with tabs[2]:
-    st.subheader("Products & Rails")
-    for rail,meta in RAILS.items():
-        with st.expander(rail):
-            st.write("Purpose:",meta["purpose"])
-            st.write("Message:",meta["message"])
-            st.write("Settlement:",meta["settlement"])
-            st.code(json.dumps({"rail":rail,"purpose":meta["purpose"],"settlement":meta["settlement"]},indent=2))
+    st.divider()
+    if st.button("Open Full Workbench →"):
+        st.session_state.view = "workbench"
+        st.rerun()
 
-with tabs[3]:
-    st.subheader("TBG-CORE Architecture")
-    st.code("""Business Requirement
+# ============== FULL WORKBENCH VIEW (all 11 tabs) ==============
+else:
+    top_left, top_right = st.columns([6,1])
+    with top_left:
+        st.markdown("""
+        <div class="tbg-header">
+        <div class="tbg-title">TBG-CORE</div>
+        <div class="tbg-sub">Institutional Payment &amp; Ledger Orchestration Workbench &middot; Enterprise Demo Build</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with top_right:
+        if st.button("← Back to Simulator"):
+            st.session_state.view = "landing"
+            st.rerun()
+
+    tabs = st.tabs([
+        "Command Center","Simulator","Products","Architecture","API Lab","API Docs",
+        "Postman","PRD","LLM Lab","Sandbox","Audit"
+    ])
+
+    with tabs[0]:
+        c1,c2,c3,c4 = st.columns(4)
+        c1.metric("Escrow Trust Pool", f"{RUPEE}14,920,000")
+        c2.metric("Treasury Float", f"{RUPEE}7,349,150")
+        c3.metric("2PC Atomic Pool", f"{RUPEE}4,975,000")
+        c4.metric("Nostro FX Mirror","$410")
+        st.subheader("Banking execution lifecycle")
+        steps = [
+            ("01","Business Requirement","Capture the operational need in business language."),
+            ("02","Requirement Normalization","Convert narrative into amount, currency, frequency, parties and constraints."),
+            ("03","AI / Rules Interpretation","Classify intent and identify candidate payment rails."),
+            ("04","Candidate Rail Discovery","Compare eligible rails against the requirement."),
+            ("05","Rail Selection","Select the deterministic rail after rules validation."),
+            ("06","Eligibility Validation","Validate account, mandate, beneficiary, currency and transaction constraints."),
+            ("07","Compliance / Policy Checks","Run simulated policy gates; production KYC/AML is not represented."),
+            ("08","Idempotency / Risk / Limits","Prevent duplicates and check configured simulation limits."),
+            ("09","Liquidity / Pool Check","Confirm the required simulated pool can support the transaction."),
+            ("10","Transaction Initiation","Create transaction and correlation identifiers."),
+            ("11","Message Construction","Build the rail-specific instruction/message."),
+            ("12","Rail Adapter Submission","Send to simulated or configured sandbox adapter."),
+            ("13","Provider Acknowledgement","Receive acceptance/acknowledgement."),
+            ("14","State Transition","Move through the transaction state machine."),
+            ("15","Ledger Impact","Post balanced simulated debit/credit entries."),
+            ("16","Pool Movement","Reserve/release the relevant liquidity pool."),
+            ("17","Settlement","Simulate settlement and value movement."),
+            ("18","Reconciliation","Match transaction, provider reference and ledger."),
+            ("19","Exception / Retry","Evaluate failures, retry or compensation path."),
+            ("20","Final State","Mark simulated success/failure."),
+            ("21","Audit","Persist the complete event chain for traceability."),
+            ("22","Operational Metrics","Expose latency, status and control outcomes.")
+        ]
+        for n,title,desc in steps:
+            st.markdown(f'<div class="step"><b>{n} &middot; {title}</b><br>{desc}</div>', unsafe_allow_html=True)
+
+    with tabs[1]:
+        st.subheader("Transaction Simulator")
+        req2 = st.text_area("Business requirement", value=f"Client needs to debit {RUPEE}10,000 loan EMI every month on the 5th via bank mandate", height=90, key="wb_req")
+        a,b,c = st.columns(3)
+        amount2 = a.number_input("Amount", min_value=1.0, value=10000.0, step=100.0, key="wb_amount")
+        currency2 = b.selectbox("Currency",["INR","USD","EUR"], key="wb_currency")
+        mode2 = c.selectbox("Mode",["SIMULATION","SANDBOX"], key="wb_mode")
+        if st.button("Execute TBG-CORE Lifecycle", type="primary", key="wb_execute"):
+            st.session_state.result = execute(req2, amount2, currency2)
+            st.session_state.audit.extend(st.session_state.result["audit"])
+            st.rerun()
+        if st.session_state.result:
+            r=st.session_state.result
+            st.success(f"{r['status']} · {r['transaction_id']}")
+            st.write(f"Intent: **{r['intent']}** | Rail: **{r['rail']}** | Pool: **{r['pool']}**")
+            st.subheader("Execution trace")
+            for e in r["audit"]:
+                st.markdown(f"**{e['event']}** · `{e['state']}` — {e['detail']}")
+
+    with tabs[2]:
+        st.subheader("Products & Rails")
+        for rail,meta in RAILS.items():
+            with st.expander(rail):
+                st.write("Purpose:",meta["purpose"])
+                st.write("Message:",meta["message"])
+                st.write("Settlement:",meta["settlement"])
+                st.code(json.dumps({"rail":rail,"purpose":meta["purpose"],"settlement":meta["settlement"]},indent=2))
+
+    with tabs[3]:
+        st.subheader("TBG-CORE Architecture")
+        st.code("""Business Requirement
         ↓
 Requirement Normalizer
         ↓
@@ -226,71 +258,71 @@ Exception & Retry
         ↓
 Audit + Operational Metrics""")
 
-with tabs[4]:
-    st.subheader("API Lab")
-    st.info("This UI mirrors the API contract. Use the Postman collection for external API calls when the FastAPI service is deployed.")
-    st.code(json.dumps({"POST":"/v1/simulate","GET":"/v1/transactions/{transaction_id}","POST":"/v1/route","GET":"/health"},indent=2))
-    st.json({"example_request":{"business_requirement":req if "req" in locals() else "EMI collection","amount":10000,"currency":"INR"}})
+    with tabs[4]:
+        st.subheader("API Lab")
+        st.info("This UI mirrors the API contract. Use the Postman collection for external API calls when the FastAPI service is deployed.")
+        st.code(json.dumps({"POST":"/v1/simulate","GET":"/v1/transactions/{transaction_id}","POST":"/v1/route","GET":"/health"},indent=2))
+        st.json({"example_request":{"business_requirement":"EMI collection","amount":10000,"currency":"INR"}})
 
-with tabs[5]:
-    st.subheader("API Docs")
-    st.markdown("### OpenAPI contract")
-    st.code("""GET  /health
+    with tabs[5]:
+        st.subheader("API Docs")
+        st.markdown("### OpenAPI contract")
+        st.code("""GET  /health
 POST /v1/route
 POST /v1/simulate
 GET  /v1/transactions/{transaction_id}
 GET  /docs
 GET  /openapi.json""")
-    st.markdown("The FastAPI companion service exposes interactive Swagger/OpenAPI documentation at `/docs`.")
+        st.markdown("The FastAPI companion service exposes interactive Swagger/OpenAPI documentation at `/docs`.")
 
-with tabs[6]:
-    st.subheader("Postman")
-    path=os.path.join(os.path.dirname(__file__),"postman","TBG-CORE.postman_collection.json")
-    if os.path.exists(path):
-        data=open(path,"rb").read()
-        st.download_button("Download TBG-CORE Postman Collection",data=data,file_name="TBG-CORE.postman_collection.json",mime="application/json")
-    st.code("""1. Import the collection into Postman.
+    with tabs[6]:
+        st.subheader("Postman")
+        path=os.path.join(os.path.dirname(__file__),"postman","TBG-CORE.postman_collection.json")
+        if os.path.exists(path):
+            data=open(path,"rb").read()
+            st.download_button("Download TBG-CORE Postman Collection",data=data,file_name="TBG-CORE.postman_collection.json",mime="application/json")
+        st.code("""1. Import the collection into Postman.
 2. Set base_url to the FastAPI Render service.
 3. Set api_key.
 4. Run Health → Route Requirement → Execute Simulation.
 5. Copy transaction_id into the Get Transaction request.""")
 
-with tabs[7]:
-    st.subheader("Working PRD")
-    p=os.path.join(os.path.dirname(__file__),"TBG_CORE_PRD.md")
-    if os.path.exists(p):
-        st.markdown(open(p,encoding="utf-8").read())
-    else:
-        st.info("TBG_CORE_PRD.md not found alongside this file.")
+    with tabs[7]:
+        st.subheader("Working PRD")
+        p=os.path.join(os.path.dirname(__file__),"TBG_CORE_PRD.md")
+        if os.path.exists(p):
+            st.markdown(open(p,encoding="utf-8").read())
+        else:
+            st.info("TBG_CORE_PRD.md not found alongside this file.")
 
-with tabs[8]:
-    st.subheader("LLM Lab")
-    st.warning("Never put provider secrets in source code or Git. Use Render Environment Variables.")
-    providers = [
-        ("OpenAI","OPENAI_API_KEY"),
-        ("Anthropic","ANTHROPIC_API_KEY"),
-        ("Google","GOOGLE_API_KEY")
-    ]
-    for name,key in providers:
-        status = "Configured" if os.getenv(key) else "Not configured"
-        st.write(f"**{name}** — `{status}`")
-    st.markdown("**Routing policy:** LLM interprets intent and proposes candidates; deterministic TBG-CORE rules make the final execution decision.")
+    with tabs[8]:
+        st.subheader("LLM Lab")
+        st.warning("Never put provider secrets in source code or Git. Use Render Environment Variables.")
+        providers = [
+            ("OpenAI","OPENAI_API_KEY"),
+            ("Anthropic","ANTHROPIC_API_KEY"),
+            ("Google","GOOGLE_API_KEY")
+        ]
+        for name,key in providers:
+            status = "Configured" if os.getenv(key) else "Not configured"
+            st.write(f"**{name}** — `{status}`")
+        st.markdown("**Routing policy:** LLM interprets intent and proposes candidates; deterministic TBG-CORE rules make the final execution decision.")
 
-with tabs[9]:
-    st.subheader("Sandbox")
-    st.info("Current mode is simulation. No real bank account or customer funds are touched.")
-    st.json({
-        "environment":"SIMULATION / SANDBOX",
-        "external_provider":"Not connected",
-        "webhook":"Simulated",
-        "ledger":"In-memory demo",
-        "real_money":False
-    })
-    st.write("Future provider adapters can be connected through the API layer without changing the core lifecycle.")
+    with tabs[9]:
+        st.subheader("Sandbox")
+        st.info("Current mode is simulation. No real bank account or customer funds are touched.")
+        st.json({
+            "environment":"SIMULATION / SANDBOX",
+            "external_provider":"Not connected",
+            "webhook":"Simulated",
+            "ledger":"In-memory demo",
+            "real_money":False
+        })
+        st.write("Future provider adapters can be connected through the API layer without changing the core lifecycle.")
 
-with tabs[10]:
-    st.subheader("Audit Trail")
-    if st.session_state.audit:
-        st.dataframe(st.session_state.audit,use_container_width=True)
-    else:
-        st.info("Execute a transaction to populate the audit trail.")
+    with tabs[10]:
+        st.subheader("Audit Trail")
+        if st.session_state.audit:
+            st.dataframe(st.session_state.audit,use_container_width=True)
+        else:
+            st.info("Execute a transaction to populate the audit trail.")
