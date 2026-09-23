@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "TBG-CORE Engine API (Simulation)",
+    "description": "Live REST API for the TBG-CORE simulated payment/treasury engine. Set the `base_url` collection variable to your running server (local or Render).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" }
+  ],
+  "item": [
+    {
+      "name": "General",
+      "item": [
+        { "name": "Root / Health", "request": { "method": "GET", "url": "{{base_url}}/" } },
+        { "name": "Service Catalog", "request": { "method": "GET", "url": "{{base_url}}/api/v1/services/catalog" } },
+        { "name": "System Telemetry", "request": { "method": "GET", "url": "{{base_url}}/api/v1/system/telemetry" } },
+        { "name": "List Transactions", "request": { "method": "GET", "url": "{{base_url}}/api/v1/transactions?limit=20" } },
+        { "name": "Get Transaction Status", "request": { "method": "GET", "url": "{{base_url}}/api/v1/transactions/TBG-XXXXXXXXXX/status" } }
+      ]
+    },
+    {
+      "name": "AI Agent",
+      "item": [
+        {
+          "name": "Route Query",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/ai/route",
+            "body": { "mode": "raw", "raw": "{\n  \"query\": \"Client needs to debit 10000 loan EMI every month on the 5th via bank mandate\"\n}" }
+          }
+        },
+        {
+          "name": "Execute Service (generic dispatch)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/engine/execute",
+            "body": { "mode": "raw", "raw": "{\n  \"service_id\": \"gst\",\n  \"params\": { \"transaction_amount\": 100000 }\n}" }
+          }
+        },
+        {
+          "name": "Execute All Services",
+          "request": { "method": "POST", "url": "{{base_url}}/api/v1/engine/execute-all" }
+        }
+      ]
+    },
+    {
+      "name": "Rails",
+      "item": [
+        {
+          "name": "1. Escrow Multi-Sig \u2014 Lock",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/escrow-multisig",
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"lock\",\n  \"amount\": 50000,\n  \"milestone_id\": \"MS-004\"\n}" }
+          }
+        },
+        {
+          "name": "1. Escrow Multi-Sig \u2014 Release",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/escrow-multisig",
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"release\",\n  \"amount\": 50000,\n  \"signatures\": 2\n}" }
+          }
+        },
+        {
+          "name": "2. 2PC Bulk Disbursal",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/bulk-disbursal",
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 25000,\n  \"beneficiary_vpa\": \"vendor@upi\",\n  \"force_timeout\": false\n}" }
+          }
+        },
+        {
+          "name": "3. Virtual Account \u2014 Collect Credit",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/virtual-account",
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 15000,\n  \"invoice_id\": \"INV-1042\"\n}" }
+          }
+        },
+        {
+          "name": "4. e-NACH \u2014 Register Mandate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/enach-mandate",
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"register\",\n  \"amount\": 10000,\n  \"frequency_days\": 30\n}" }
+          }
+        },
+        {
+          "name": "4. e-NACH \u2014 Trigger Pull",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/enach-mandate",
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"trigger\",\n  \"mandate_id\": \"MNDT-XXXXXXXX\"\n}" }
+          }
+        },
+        {
+          "name": "5. Liquidity Sweep",
+          "request": { "method": "POST", "url": "{{base_url}}/api/v1/services/liquidity-sweep" }
+        },
+        {
+          "name": "6. Cross-Border FX Nostro",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/fx-nostro",
+            "body": { "mode": "raw", "raw": "{\n  \"amount_usd\": 500\n}" }
+          }
+        },
+        {
+          "name": "7. Account Aggregator Consent Pull",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/account-aggregator",
+            "body": { "mode": "raw", "raw": "{\n  \"consent_granted\": true,\n  \"purpose\": \"Algorithmic underwriting\"\n}" }
+          }
+        },
+        {
+          "name": "8. Marketplace Split",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/marketplace-split",
+            "body": { "mode": "raw", "raw": "{\n  \"gross_amount\": 20000,\n  \"commission_pct\": 10\n}" }
+          }
+        },
+        {
+          "name": "9. Statutory Tax (GST) Escrow",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/v1/services/gst-statutory-escrow",
+            "body": { "mode": "raw", "raw": "{\n  \"transaction_amount\": 100000\n}" }
+          }
+        }
+      ]
+    }
+  ]
+}
