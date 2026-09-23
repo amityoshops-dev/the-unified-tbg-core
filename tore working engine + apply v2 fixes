@@ -1,0 +1,21 @@
+[33md4de11a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Remove backup file, add gitignore rule
+[33m6933ff5[m Initial TBG-CORE commit
+[33mce5374b[m Add TBG-CORE API service, Postman collection, and README
+[33m8b0e2f8[m Trigger redeploy
+[33mdac74eb[m Fix deploy: merged requirements + Procfile fallback for Streamlit start
+[33mb7aef6a[m Replace placeholder dashboard with merged version
+[33m4805902[m Merge dashboard into the FastAPI engine at /
+[33m088f025[m Add live TBG-CORE REST API + Postman collection
+[33m0f7c853[m Add streamlit to requirements
+[33m925fa3f[m Add TBG-CORE engine simulator
+[33m7947b7e[m fix: revert engine 7 to standard rbi account aggregator architecture
+[33mcf41ff5[m feat: sync 9 core services and openapi spec
+[33m05fb529[m fix: add engines 7 8 9 with dark 3x3 layout
+[33mf94ca0f[m fix: serve index.html directly
+[33m82d43a2[m fix: serve index.html directly with 3x3 layout
+[33mc6862df[m deploy: update banking engine to render
+[33m4fa52a0[m feat: complete all 9 banking service executions, interactive drawer, and batch suite runner
+[33mad92175[m fix: pin python version to 3.12 for prebuilt wheels on render
+[33me8cabdb[m fix: unpin requirements for prebuilt wheels on render
+[33m9cadc7f[m feat: complete unified tbg core engine with sqlite, async 2pc worker, and verified test suite
+[33mb48876b[m feat: initial commit for TBG-Core bank-grade cash management platform

@@ -1,0 +1,131 @@
+[33mcommit 91a83218a163afe2504ed6954a81449cf42e0f3b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 14:55:01 2026 +0530
+
+    Fix: remove broken files submodule reference, sync simulator
+
+[33mcommit d4de11ab1316031930476b8ceb3602869b677993[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 14:42:43 2026 +0530
+
+    Remove backup file, add gitignore rule
+
+[33mcommit 6933ff5a1939d2d42f47b4ca48ab030ed9c1793d[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 14:41:17 2026 +0530
+
+    Initial TBG-CORE commit
+
+[33mcommit ce5374b23b3949fea55bc07008f9ff400812d71f[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 14:39:54 2026 +0530
+
+    Add TBG-CORE API service, Postman collection, and README
+
+[33mcommit 8b0e2f8b36cb27a60211227f20d6ceb06f180d9c[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 12:47:35 2026 +0530
+
+    Trigger redeploy
+
+[33mcommit dac74eb8e7052cf042d38c23a3fecb1f7f7b8228[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 12:38:05 2026 +0530
+
+    Fix deploy: merged requirements + Procfile fallback for Streamlit start
+
+[33mcommit b7aef6a83301d4830fbc29e9d91f6323d45157e1[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 12:19:46 2026 +0530
+
+    Replace placeholder dashboard with merged version
+
+[33mcommit 4805902ca00054dc48449fcf7032e34ee84a3cc1[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 12:07:03 2026 +0530
+
+    Merge dashboard into the FastAPI engine at /
+
+[33mcommit 088f02503542a2eac5be855364223799edf8fc89[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Wed Sep 23 11:47:46 2026 +0530
+
+    Add live TBG-CORE REST API + Postman collection
+
+[33mcommit 0f7c853300747c075d9526214a75bde76b3783ba[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 15:22:03 2026 +0530
+
+    Add streamlit to requirements
+
+[33mcommit 925fa3f1ba1c24237fd27c818b11a640b3344eb9[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 15:09:23 2026 +0530
+
+    Add TBG-CORE engine simulator
+
+[33mcommit 7947b7e1b26a47715edd24bb09ee3fbc6f427f29[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 14:32:55 2026 +0530
+
+    fix: revert engine 7 to standard rbi account aggregator architecture
+
+[33mcommit cf41ff5117011502ab47af54e6eadbf6379fa01d[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 14:21:22 2026 +0530
+
+    feat: sync 9 core services and openapi spec
+
+[33mcommit 05fb529a4bc45b2522b112abae2ad964398290b4[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 14:15:21 2026 +0530
+
+    fix: add engines 7 8 9 with dark 3x3 layout
+
+[33mcommit f94ca0fd7f4aacbdbfafd2320e4e5a23cd87641f[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 14:01:22 2026 +0530
+
+    fix: serve index.html directly
+
+[33mcommit 82d43a2ce3df796b068f012a1474ae2674976295[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Tue Sep 22 13:59:50 2026 +0530
+
+    fix: serve index.html directly with 3x3 layout
+
+[33mcommit c6862df8b4d977cbbcc53b208b9d4356a87b5988[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Mon Sep 21 16:02:38 2026 +0530
+
+    deploy: update banking engine to render
+
+[33mcommit 4fa52a0c81ce770a1a3ded78ce8c6be30046c759[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Mon Sep 21 15:48:55 2026 +0530
+
+    feat: complete all 9 banking service executions, interactive drawer, and batch suite runner
+
+[33mcommit ad921758e6a63a4b58c60ad9e8adcc614063a466[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Sun Sep 20 23:51:25 2026 +0530
+
+    fix: pin python version to 3.12 for prebuilt wheels on render
+
+[33mcommit e8cabdb243334be45df165a4897ee4675ca78a59[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Sun Sep 20 23:50:09 2026 +0530
+
+    fix: unpin requirements for prebuilt wheels on render
+
+[33mcommit 9cadc7f2ef9a610caa931a774fc282bb50aef820[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Sun Sep 20 23:27:46 2026 +0530
+
+    feat: complete unified tbg core engine with sqlite, async 2pc worker, and verified test suite
+
+[33mcommit b48876b5816dc3c87012c69ec3deb1564e371692[m
+Author: amityoshops-dev <amit.yoshops@gmail.com>
+Date:   Thu Sep 17 20:31:34 2026 +0530
+
+    feat: initial commit for TBG-Core bank-grade cash management platform
