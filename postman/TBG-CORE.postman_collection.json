@@ -1,0 +1,31 @@
+﻿{
+  "info": {
+    "name": "TBG-CORE API",
+    "_postman_id": "tbg-core-demo-2026",
+    "description": "Sandbox API collection for the TBG-CORE Institutional Payment & Ledger Orchestration Workbench. All transactions are simulated unless an external sandbox is explicitly configured.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key":"base_url","value":"https://YOUR-API-SERVICE.onrender.com"},
+    {"key":"api_key","value":"demo-key"},
+    {"key":"transaction_id","value":""}
+  ],
+  "item": [
+    {
+      "name":"Health",
+      "request":{"method":"GET","header":[],"url":{"raw":"{{base_url}}/health","host":["{{base_url}}"],"path":["health"]}}
+    },
+    {
+      "name":"Route Requirement",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-API-Key","value":"{{api_key}}"}],"body":{"mode":"raw","raw":"{\n  \"business_requirement\":\"Client needs to debit INR 10000 loan EMI every month on the 5th via bank mandate\",\n  \"amount\":10000,\n  \"currency\":\"INR\"\n}"},"url":{"raw":"{{base_url}}/v1/route","host":["{{base_url}}"],"path":["v1","route"]}}
+    },
+    {
+      "name":"Execute Simulation",
+      "request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"X-API-Key","value":"{{api_key}}"},{"key":"Idempotency-Key","value":"demo-{{$timestamp}}"}],"body":{"mode":"raw","raw":"{\n  \"business_requirement\":\"Client needs to debit INR 10000 loan EMI every month on the 5th via bank mandate\",\n  \"amount\":10000,\n  \"currency\":\"INR\",\n  \"rail\":\"NACH\"\n}"},"url":{"raw":"{{base_url}}/v1/simulate","host":["{{base_url}}"],"path":["v1","simulate"]}}
+    },
+    {
+      "name":"Get Transaction",
+      "request":{"method":"GET","header":[{"key":"X-API-Key","value":"{{api_key}}"}],"url":{"raw":"{{base_url}}/v1/transactions/{{transaction_id}}","host":["{{base_url}}"],"path":["v1","transactions","{{transaction_id}}"]}}
+    }
+  ]
+}

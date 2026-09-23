@@ -1,4 +1,6 @@
-﻿
-streamlit>=1.32
-pandas
-anthropic
+﻿streamlit==1.64.0
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+pydantic==2.13.5
+python-dotenv==1.2.3
+httpx==0.28.1

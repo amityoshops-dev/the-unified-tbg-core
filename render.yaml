@@ -1,0 +1,27 @@
+﻿# TBG-CORE dual service Render blueprint
+services:
+  - type: web
+    name: tbg-core-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn tbg_core_api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: TBG_API_KEY
+        sync: false
+
+  - type: web
+    name: tbg-core-simulator
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run tbg_core_simulator.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
