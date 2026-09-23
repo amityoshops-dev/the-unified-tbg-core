@@ -1,4 +1,4 @@
-﻿import os, uuid, json, hashlib
+import os, uuid, json, hashlib
 from datetime import datetime, timezone
 from decimal import Decimal
 from dotenv import load_dotenv
@@ -104,7 +104,8 @@ def execute(req, amount, currency):
 if "result" not in st.session_state: st.session_state.result = None
 if "audit" not in st.session_state: st.session_state.audit = []
 
-# Professional shell
+RUPEE = "\u20B9"
+
 st.markdown("""
 <style>
 .block-container {padding-top:1.4rem; max-width:1500px;}
@@ -120,7 +121,7 @@ st.markdown("""
 st.markdown("""
 <div class="tbg-header">
 <div class="tbg-title">TBG-CORE</div>
-<div class="tbg-sub">Institutional Payment & Ledger Orchestration Workbench Â· Enterprise Demo Build</div>
+<div class="tbg-sub">Institutional Payment &amp; Ledger Orchestration Workbench &middot; Enterprise Demo Build</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -131,9 +132,9 @@ tabs = st.tabs([
 
 with tabs[0]:
     c1,c2,c3,c4 = st.columns(4)
-    c1.metric("Escrow Trust Pool","â‚¹14,920,000")
-    c2.metric("Treasury Float","â‚¹7,349,150")
-    c3.metric("2PC Atomic Pool","â‚¹4,975,000")
+    c1.metric("Escrow Trust Pool", f"{RUPEE}14,920,000")
+    c2.metric("Treasury Float", f"{RUPEE}7,349,150")
+    c3.metric("2PC Atomic Pool", f"{RUPEE}4,975,000")
     c4.metric("Nostro FX Mirror","$410")
     st.subheader("Banking execution lifecycle")
     steps = [
@@ -161,11 +162,11 @@ with tabs[0]:
         ("22","Operational Metrics","Expose latency, status and control outcomes.")
     ]
     for n,title,desc in steps:
-        st.markdown(f'<div class="step"><b>{n} Â· {title}</b><br>{desc}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="step"><b>{n} &middot; {title}</b><br>{desc}</div>', unsafe_allow_html=True)
 
 with tabs[1]:
     st.subheader("Transaction Simulator")
-    req = st.text_area("Business requirement", value="Client needs to debit â‚¹10,000 loan EMI every month on the 5th via bank mandate", height=90)
+    req = st.text_area("Business requirement", value=f"Client needs to debit {RUPEE}10,000 loan EMI every month on the 5th via bank mandate", height=90)
     a,b,c = st.columns(3)
     amount = a.number_input("Amount", min_value=1.0, value=10000.0, step=100.0)
     currency = b.selectbox("Currency",["INR","USD","EUR"])
@@ -176,11 +177,11 @@ with tabs[1]:
         st.rerun()
     if st.session_state.result:
         r=st.session_state.result
-        st.success(f"{r['status']} Â· {r['transaction_id']}")
+        st.success(f"{r['status']} · {r['transaction_id']}")
         st.write(f"Intent: **{r['intent']}** | Rail: **{r['rail']}** | Pool: **{r['pool']}**")
         st.subheader("Execution trace")
         for e in r["audit"]:
-            st.markdown(f"**{e['event']}** Â· `{e['state']}` â€” {e['detail']}")
+            st.markdown(f"**{e['event']}** · `{e['state']}` — {e['detail']}")
 
 with tabs[2]:
     st.subheader("Products & Rails")
@@ -194,35 +195,35 @@ with tabs[2]:
 with tabs[3]:
     st.subheader("TBG-CORE Architecture")
     st.code("""Business Requirement
-        â†“
+        ↓
 Requirement Normalizer
-        â†“
+        ↓
 AI / Rules Intent Layer
-        â†“
+        ↓
 Rail Candidate Engine
-        â†“
+        ↓
 Deterministic Policy & Eligibility
-        â†“
+        ↓
 Risk / Limits / Idempotency
-        â†“
+        ↓
 Liquidity & Pool Controller
-        â†“
+        ↓
 Transaction Orchestrator
-        â†“
+        ↓
 Rail Adapter Layer
-        â†“
+        ↓
 Provider / Sandbox
-        â†“
+        ↓
 State Machine
-        â†“
+        ↓
 Double-Entry Ledger
-        â†“
+        ↓
 Settlement / Pool Movement
-        â†“
+        ↓
 Reconciliation
-        â†“
+        ↓
 Exception & Retry
-        â†“
+        ↓
 Audit + Operational Metrics""")
 
 with tabs[4]:
@@ -251,13 +252,16 @@ with tabs[6]:
     st.code("""1. Import the collection into Postman.
 2. Set base_url to the FastAPI Render service.
 3. Set api_key.
-4. Run Health â†’ Route Requirement â†’ Execute Simulation.
+4. Run Health → Route Requirement → Execute Simulation.
 5. Copy transaction_id into the Get Transaction request.""")
 
 with tabs[7]:
     st.subheader("Working PRD")
     p=os.path.join(os.path.dirname(__file__),"TBG_CORE_PRD.md")
-    st.markdown(open(p,encoding="utf-8").read())
+    if os.path.exists(p):
+        st.markdown(open(p,encoding="utf-8").read())
+    else:
+        st.info("TBG_CORE_PRD.md not found alongside this file.")
 
 with tabs[8]:
     st.subheader("LLM Lab")
@@ -269,7 +273,7 @@ with tabs[8]:
     ]
     for name,key in providers:
         status = "Configured" if os.getenv(key) else "Not configured"
-        st.write(f"**{name}** â€” `{status}`")
+        st.write(f"**{name}** — `{status}`")
     st.markdown("**Routing policy:** LLM interprets intent and proposes candidates; deterministic TBG-CORE rules make the final execution decision.")
 
 with tabs[9]:
