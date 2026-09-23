@@ -38,10 +38,13 @@ import os
 import random
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 try:
@@ -51,6 +54,7 @@ except ImportError:
     ANTHROPIC_SDK_AVAILABLE = False
 
 DEFAULT_MODEL = "claude-sonnet-5"
+STATIC_DIR = Path(__file__).parent / "static"
 
 app = FastAPI(
     title="TBG-CORE Engine API (Simulation)",
@@ -63,6 +67,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # ============================================================================
 # IN-MEMORY LEDGER + TRANSACTION LOG (single-process demo state)
@@ -290,12 +296,21 @@ class ExecuteRequest(BaseModel):
 # GENERAL ENDPOINTS
 # ============================================================================
 
-@app.get("/", tags=["General"])
-def root():
+@app.get("/", response_class=HTMLResponse, tags=["General"])
+def dashboard():
+    """Serves the live HTML dashboard. It's a plain static file that calls
+    the same JSON endpoints below via fetch() \u2014 so the dashboard and
+    Postman/curl always show the same live ledger state."""
+    return (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+
+
+@app.get("/api/v1/status", tags=["General"])
+def api_status():
     return {
         "service": "TBG-CORE Engine API",
         "mode": "SIMULATION",
         "docs": "/docs",
+        "dashboard": "/",
         "catalog": "/api/v1/services/catalog",
     }
 
